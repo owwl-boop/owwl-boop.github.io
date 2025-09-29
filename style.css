@@ -1,0 +1,270 @@
+/* 基本設定 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 30px;
+    max-width: 750px; /* ワイド方向のサイズ縮小 */
+    margin: auto;
+    background-color: #f4f7f6; 
+    color: #333;
+    line-height: 1.6;
+}
+
+h1 {
+    font-size: 2.2em;
+    color: #1e88e5; 
+    border-bottom: 3px solid #1e88e5;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    font-weight: 300; 
+}
+
+h2 {
+    font-size: 1.5em;
+    color: #555;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    border-left: 4px solid #4fc3f7; 
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+/* フォーム部品のスタイル */
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 5px;
+}
+
+input[type="number"], 
+input[type="text"], 
+select {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: #fff;
+}
+
+input[type="number"]:focus, 
+input[type="text"]:focus, 
+select:focus {
+    border-color: #1e88e5;
+    box-shadow: 0 0 5px rgba(30, 136, 229, 0.5);
+    outline: none;
+}
+
+/* グループ化レイアウト */
+.input-group {
+    display: flex;
+    gap: 20px;
+}
+
+.input-group > div {
+    flex: 1;
+}
+
+/* 材料リストのスタイル */
+.material-category {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #ffffff;
+}
+
+.material-category h3 {
+    font-size: 1.3em;
+    color: #444;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.material-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.material-item .name-select {
+    flex: 3;
+}
+
+.material-item input {
+    flex: 1;
+}
+
+/* ボタンのスタイル */
+button {
+    padding: 12px 20px;
+    background-color: #00bcd4; 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+button:hover {
+    background-color: #0097a7;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+.material-item button, .custom-item button {
+    background-color: #ff5252; 
+    flex: 0 0 80px;
+}
+
+.material-item button:hover, .custom-item button:hover {
+    background-color: #d32f2f;
+}
+
+.material-category button {
+    background-color: #4caf50; 
+    margin-top: 15px;
+}
+
+.material-category button:hover {
+    background-color: #388e3c;
+}
+
+
+/* 見積もり結果エリア */
+#results {
+    margin-top: 40px;
+    padding: 25px;
+    border: none;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#results h2 {
+    color: #1e88e5;
+    border-left: none;
+    padding-left: 0;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.result-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-bottom: 3px;
+    border-bottom: 1px dotted #eee;
+}
+
+.result-line span:last-child {
+    font-weight: 700;
+    font-size: 1.1em;
+}
+
+.sub-total {
+    color: #c0392b; 
+    font-size: 1.1em;
+    border-top: 1px dashed #ccc;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+/* 最終価格の強調 */
+.final-price {
+    font-size: 1.8em;
+    margin-top: 25px;
+    color: #27ae60; 
+    font-weight: bold;
+    border-top: 2px solid #27ae60;
+    padding-top: 15px;
+}
+/* 税別価格の調整 */
+.no-tax-price {
+    font-size: 1.2em; /* 税込より小さく */
+    color: #3498db; /* 税込と色を変える */
+    font-weight: 600;
+    border-top: none;
+    padding-top: 5px;
+    margin-top: 5px;
+}
+
+/* 記号の色 */
+#outputTotalCost {
+    color: #d35400; 
+}
+
+#outputProjectProfitAmount {
+    color: #2ecc71; 
+}
+
+
+/* 印刷/PDF保存用スタイル */
+@media print {
+    body {
+        max-width: none;
+        padding: 0;
+        margin: 0;
+        background-color: white;
+    }
+
+    /* 印刷時に非表示にする要素 */
+    h1, 
+    h2:nth-of-type(1), 
+    .input-group,
+    label,
+    input,
+    select,
+    hr:nth-of-type(1), 
+    hr:nth-of-type(2), 
+    .material-category,
+    button,
+    .history-list,
+    .modal {
+        display: none !important;
+    }
+
+    /* 見積もり結果セクションだけを強調 */
+    #results {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        margin-top: 0;
+    }
+    
+    #results h2 {
+        font-size: 1.8em;
+        text-align: left;
+        color: #333;
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 15px;
+    }
+
+    /* 最終的な価格を強調 */
+    .final-price {
+        border-top: 3px solid #27ae60;
+        padding-top: 20px;
+        margin-top: 30px;
+    }
+}

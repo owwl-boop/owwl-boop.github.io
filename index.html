@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>家具製造 見積もりアプリ</title>
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        /* 💡 モーダル用の基本CSSは、別途CSSファイルに移すことも可能ですが、
+           ここでは利便性と構造維持のため、HTML内のstyleブロックに残します。*/
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover, .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .edit-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+            align-items: center;
+        }
+        .edit-item span {
+            flex: 2;
+        }
+        .edit-item input {
+            flex: 1;
+            width: auto;
+            text-align: right;
+        }
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dotted #eee;
+        }
+        .history-item span {
+            cursor: pointer;
+            color: #1e88e5;
+            font-weight: 600;
+        }
+        .history-item button {
+            margin-top: 0;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            background-color: #ff5252;
+        }
+
+        .custom-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            padding: 10px;
+            background-color: #fff8e1; 
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .custom-item input[type="text"] {
+            flex: 3; 
+        }
+        .custom-item input[type="number"] {
+            flex: 1;
+        }
+        .custom-item button {
+            flex: 0 0 80px;
+        }
+        /* 材料追加フォームのレイアウト調整 */
+        #newMaterialCategory, #newMaterialName, #newMaterialSpec, #newMaterialPrice {
+            display: inline-block;
+            margin-top: 5px;
+            vertical-align: top;
+        }
+        #newMaterialPrice {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>家具製造 見積もり計算</h1>
+
+    <button onclick="openPriceModal()" style="background-color: #f9a825;">単価マスタを編集/追加</button>
+
+    <h2>1. 原価設定と利益加算率</h2>
+    <label>製品名:</label>
+    <input type="text" id="productName" value="カスタムシェルフ">
+    <label>見積もり番号:</label>
+    <input type="text" id="estimateNumber" value="" placeholder="自動採番されます">
+
+    <div class="input-group">
+        <div>
+            <label>加工工数 (日数):</label>
+            <input type="number" id="laborDays" value="2" min="0" step="0.5">
+        </div>
+        <div>
+            <label>一日あたり工賃単価 (円):</label>
+            <input type="number" id="dailyLaborRate" value="30000" min="0">
+        </div>
+    </div>
+    
+    <div class="input-group">
+        <div>
+            <label>A. 材料費への利益加算率 (%)</label>
+            <input type="number" id="materialProfitRate" value="15" min="0" max="1000">
+        </div>
+        <div>
+            <label>B. 全体総原価への利益加算率 (%)</label>
+            <input type="number" id="projectProfitRate" value="20" min="0" max="1000">
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>見積もり履歴</h2>
+    <div class="history-list" id="historyList">
+        履歴はありません。
+    </div>
+    <hr>
+    
+    <h2>3. 材料費の入力 (カテゴリ別)</h2>
+    
+    <div class="material-category">
+        <h3>化粧材</h3>
+        <div id="materialsList_化粧材"></div>
+        <div id="customList_化粧材"></div> 
+        <button onclick="addMaterial('化粧材')">➕ 化粧材をプルダウンから追加</button>
+        <button onclick="addCustomMaterial('化粧材')" style="background-color: #ffd600;">カスタム材料を追加</button>
+    </div>
+    
+    <div class="material-category">
+        <h3>下地材</h3>
+        <div id="materialsList_下地材"></div>
+        <div id="customList_下地材"></div> 
+        <button onclick="addMaterial('下地材')">➕ 下地材をプルダウンから追加</button>
+        <button onclick="addCustomMaterial('下地材')" style="background-color: #ffd600;">カスタム材料を追加</button>
+    </div>
+
+    <div class="material-category">
+        <h3>金物</h3>
+        <div id="materialsList_金物"></div>
+        <div id="customList_金物"></div> 
+        <button onclick="addMaterial('金物')">➕ 金物をプルダウンから追加</button>
+        <button onclick="addCustomMaterial('金物')" style="background-color: #ffd600;">カスタム材料を追加</button>
+    </div>
+
+    <div class="material-category">
+        <h3> 外注費</h3>
+        <div id="materialsList_外注費"></div>
+        <div id="customList_外注費"></div> 
+        <button onclick="addMaterial('外注費')">➕ 外注費をプルダウンから追加</button>
+        <button onclick="addCustomMaterial('外注費')" style="background-color: #ffd600;">カスタム材料を追加</button>
+    </div>
+
+    <hr>
+
+    <div style="display: flex; gap: 20px;">
+        <button onclick="calculateEstimate()" style="flex: 1;">見積もりを計算・保存する</button>
+        <button onclick="printEstimate()" style="flex: 1; background-color: #2980b9;">PDF保存 / 印刷</button>
+    </div>
+
+    <div id="results">
+        <h2>見積もり結果詳細</h2>
+        <div class="result-line"><span>製品名:</span><span id="outputProductName"></span></div><hr>
+        
+        <h3 style="color: #1e88e5; margin-top: 20px;">材料費の内訳 (ベース原価)</h3>
+        <div id="outputMaterialBreakdown">
+            </div>
+        
+        <div id="outputCategoryTotals">
+            </div>
+        <div class="result-line" style="margin-top: 20px;"><span>**材料費合計 (ベース原価):**</span><span id="outputBaseMaterialCost">¥0</span></div>
+        <div class="result-line sub-total"><span>A. 材料費上乗せ利益 (<span id="outputMaterialProfitRateValue">0%</span>):</span><span id="outputMaterialProfitAmount">¥0</span></div>
+        <div class="result-line sub-total"><span>**利益込み材料費 (A):**</span><span id="outputMaterialCostWithProfit">¥0</span></div>
+        <div class="result-line" style="margin-top: 15px;"><span>加工費 (日数<span id="outputLaborDaysValue">0</span> \ 単価):</span><span id="outputLaborCost">¥0</span></div><hr>
+        <div class="result-line"><span>**総原価 (A + 加工費):**</span><span id="outputTotalCost" style="color: red;">¥0</span></div>
+        <div class="result-line sub-total"><span>B. 全体上乗せ利益 (<span id="outputProjectProfitRateValue">0%</span>):</span><span id="outputProjectProfitAmount" style="color: green;">¥0</span></div>
+        
+        <div class="result-line final-price no-tax-price"><span>**最終見積価格 (税別):**</span><span id="outputFinalPriceNoTax">¥0</span></div>
+        
+        <div class="result-line final-price"><span>**最終見積価格 (税込):**</span><span id="outputFinalPrice">¥0</span></div>
+    </div>
+
+    <div id="priceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePriceModal()">&times;</span>
+            <h2>単価マスタの編集 (一時的)</h2>
+            <p>※ ここでの変更はブラウザを閉じても維持されますが、コード内のデフォルト値は変更されません。</p>
+            
+            <div style="border: 1px dashed #ccc; padding: 15px; margin-bottom: 20px; background-color: #f0f8ff;">
+                <h4>➕ 新しい材料をマスタに追加</h4>
+                <select id="newMaterialCategory" style="width: 30%;">
+                    <option value="化粧材">化粧材</option>
+                    <option value="下地材">下地材</option>
+                    <option value="金物">金物</option>
+                    <option value="外注費">外注費</option>
+                </select>
+                <input type="text" id="newMaterialName" placeholder="材料名 (例: ラワンベニヤ)" style="width: 30%; margin-right: 5px;">
+                <input type="text" id="newMaterialSpec" placeholder="規格 (例: 4*8)" style="width: 20%; margin-right: 5px;">
+                <input type="number" id="newMaterialPrice" placeholder="単価 (円)" min="0" style="width: 10%;">
+                <button onclick="addNewMaterialToDB()" style="margin-top: 10px; background-color: #27ae60; padding: 8px 15px; font-size: 0.9em;">追加</button>
+            </div>
+
+            <div id="modalPriceEditor">
+                </div>
+            <button onclick="savePriceChanges()">変更を保存</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
